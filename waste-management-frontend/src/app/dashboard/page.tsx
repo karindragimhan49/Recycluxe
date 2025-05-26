@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import WasteCard from '@/components/WasteCard';
 import WasteForm from '@/components/WasteForm';
+import HomeStats from '@/components/HomeStats';
+import WasteChart from '@/components/WasteChart';
+import RecentWasteList from '@/components/RecentWasteList';
 
 interface Waste {
   _id: string;
@@ -52,10 +55,17 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Waste Dashboard</h2>
+    <div className="p-6 space-y-6">
+      <h2 className="text-2xl font-bold">Waste Dashboard</h2>
+
       {error && <p className="text-red-500">{error}</p>}
 
+      {/* Stats and Chart */}
+      <HomeStats />
+      <WasteChart />
+      <RecentWasteList />
+
+      {/* Add/Edit Waste Form */}
       <WasteForm
         onSuccess={() => {
           fetchWaste();
@@ -65,14 +75,17 @@ export default function DashboardPage() {
         cancelEdit={cancelEdit}
       />
 
-      {wastes.map((waste) => (
-        <WasteCard
-          key={waste._id}
-          waste={waste}
-          onDelete={deleteWaste}
-          onEdit={startEdit}
-        />
-      ))}
+      {/* Waste Entries */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {wastes.map((waste) => (
+          <WasteCard
+            key={waste._id}
+            waste={waste}
+            onDelete={deleteWaste}
+            onEdit={startEdit}
+          />
+        ))}
+      </div>
     </div>
   );
 }
