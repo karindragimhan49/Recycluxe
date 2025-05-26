@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 interface Waste {
   _id?: string;
@@ -33,19 +34,30 @@ export default function WasteForm({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (form._id) {
-        await api.put(`/waste/${form._id}`, form);
-      } else {
-        await api.post('/waste', form);
-      }
-      setForm({ type: '', weight: 0, location: '' });
-      onSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Submission failed');
+  e.preventDefault();
+
+  // Frontend validation
+  if (!form.type.trim() || form.weight <= 0 || !form.location.trim()) {
+    toast.error('Please fill out all fields correctly.');
+    return;
+  }
+
+  try {
+    if (form._id) {
+      await api.put(`/waste/${form._id}`, form);
+      toast.success('Waste updated successfully!');
+    } else {
+      await api.post('/waste', form);
+      toast.success('Waste added successfully!');
     }
-  };
+    setForm({ type: '', weight: 0, location: '' });
+    onSuccess();
+  } catch (err: any) {
+    const message = err.response?.data?.message || 'Submission failed';
+    toast.error(message);
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 border p-4 rounded mb-4">

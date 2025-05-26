@@ -4,6 +4,11 @@ const Waste = require("../models/Waste");
 exports.createWaste = async (req, res) => {
   const { type, weight, location } = req.body;
 
+  // 🔐 Basic Validation
+  if (!type || !location || typeof weight !== 'number' || weight <= 0) {
+    return res.status(400).json({ message: 'All fields are required and weight must be a positive number' });
+  }
+
   try {
     const waste = new Waste({
       type,
@@ -15,7 +20,7 @@ exports.createWaste = async (req, res) => {
     await waste.save();
     res.status(201).json(waste);
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
